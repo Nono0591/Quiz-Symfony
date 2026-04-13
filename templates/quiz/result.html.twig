@@ -1,0 +1,13 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+<div class="gaming-card">
+
+    <h1>Résultat du quiz : {{ quiz.title }}</h1>
+
+    <p>Score : {{ score }} / {{ total }}</p>
+
+    <a href="{{ path('app_quiz_index') }}" class="btn-gaming">Retour aux quiz</a>
+
+</div>
+{% endblock %}

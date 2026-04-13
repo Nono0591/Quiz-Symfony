@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Commencer le Quiz{% endblock %}
+
+{% block body %}
+<h1 class="mb-4">Entrer votre pseudo</h1>
+
+<div class="gaming-card">
+    <form method="post">
+        <div class="mb-3">
+            <label class="form-label">Pseudo</label>
+            <input type="text" name="pseudo" class="form-control" required>
+        </div>
+
+        <button type="submit" class="btn btn-gaming">Commencer</button>
+    </form>
+</div>
+{% endblock %}

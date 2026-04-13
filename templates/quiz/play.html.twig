@@ -1,0 +1,108 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Quiz - {{ quiz.title }}{% endblock %}
+
+{% block body %}
+<h1 class="mb-4">{{ quiz.title }}</h1>
+
+<div class="gaming-card">
+
+    <!-- Titre dynamique de la question -->
+    <h3 id="question-title"></h3>
+
+    <form id="quiz-form" method="post" action="{{ path('quiz_submit', {id: quiz.id}) }}">
+
+        {% for question in quiz.questions %}
+            <div class="question-block d-none" data-question-id="{{ question.id }}">
+
+                <!-- Titre de la question (caché mais utilisé par JS) -->
+                <h3 class="question-text d-none">{{ question.title }}</h3>
+
+                {% for reponse in question.reponses %}
+                    <div class="form-check mb-2">
+                        <input class="form-check-input"
+                               type="radio"
+                               name="q{{ question.id }}"
+                               value="{{ reponse.id }}">
+                        <label class="form-check-label">
+                            {{ reponse.libelle }}
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        <button type="button" id="next-btn" class="btn btn-gaming mt-3">Question suivante</button>
+        <button type="submit" id="submit-btn" class="btn btn-gaming mt-3 d-none">Terminer le quiz</button>
+    </form>
+
+    <div class="mt-4">
+        <h4>⏱ Temps restant : <span id="timer">30</span>s</h4>
+        <p>Question <span id="current-number">1</span> / {{ quiz.questions|length }}</p>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    let questions = document.querySelectorAll('.question-block');
+    let current = 0;
+    let timer = 30;
+    let interval;
+
+    function showQuestion(index) {
+
+        // Masquer toutes les questions
+        questions.forEach(q => q.classList.add('d-none'));
+
+        // Afficher la question actuelle
+        questions[index].classList.remove('d-none');
+
+        // Récupérer le titre de la question
+        let title = questions[index].querySelector('.question-text').innerText;
+        document.getElementById('question-title').innerText = title;
+
+        // Numéro de question
+        document.getElementById('current-number').innerText = index + 1;
+
+        // Reset timer
+        resetTimer();
+    }
+
+    function resetTimer() {
+        clearInterval(interval);
+        timer = 30;
+        document.getElementById('timer').innerText = timer;
+
+        interval = setInterval(() => {
+            timer--;
+            document.getElementById('timer').innerText = timer;
+
+            if (timer <= 0) {
+                nextQuestion();
+            }
+        }, 1000);
+    }
+
+    function nextQuestion() {
+        current++;
+
+        // Si plus de questions → soumission auto
+        if (current >= questions.length) {
+            clearInterval(interval);
+            document.getElementById('next-btn').classList.add('d-none');
+            document.getElementById('submit-btn').classList.remove('d-none');
+            document.getElementById('quiz-form').submit();
+            return;
+        }
+
+        showQuestion(current);
+    }
+
+    document.getElementById('next-btn').addEventListener('click', nextQuestion);
+
+    // Afficher la première question
+    showQuestion(0);
+</script>
+{% endblock %}
